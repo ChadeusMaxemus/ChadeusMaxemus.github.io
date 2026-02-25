@@ -3,7 +3,6 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin Console</title>
-
 <style>
 body{
     font-family: Arial;
@@ -18,9 +17,19 @@ table{
     border-collapse: collapse;
 }
 
-td,th{
+td, th{
     border:1px solid #444;
     padding:8px;
+}
+button{
+    padding:5px 10px;
+    background:#555;
+    color:white;
+    border:none;
+    cursor:pointer;
+}
+button:hover{
+    background:#888;
 }
 </style>
 </head>
@@ -28,20 +37,16 @@ td,th{
 <body>
 
 <h2>Admin Console</h2>
+<div id="adminTable">Loading competitors...</div>
 
 <script type="module">
 
 import { db } from "./firebase.js";
-import {
-    collection,
-    getDocs,
-    deleteDoc,
-    doc,
-    updateDoc
-} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+import { collection, getDocs, deleteDoc, doc } 
+    from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
 /* ===== ADMIN PASSWORD ===== */
-const ADMIN_PASSWORD = "405060";
+const ADMIN_PASSWORD = "CHANGE_THIS_PASSWORD";
 
 /* Password Gate */
 const inputPass = prompt("Enter admin password");
@@ -51,7 +56,7 @@ if(inputPass !== ADMIN_PASSWORD){
     window.location.href = "/";
 }
 
-/* Load competitors */
+/* Load competitors and render table */
 async function loadCompetitors(){
 
     const snapshot = await getDocs(collection(db,"competitors"));
@@ -66,58 +71,47 @@ async function loadCompetitors(){
     </tr>
     `;
 
-    snapshot.forEach(docSnap=>{
-        const data = docSnap.data();
+    if(snapshot.empty){
+        html += `<tr><td colspan="4">No competitors yet</td></tr>`;
+    } else {
+        snapshot.forEach(docSnap=>{
+            const data = docSnap.data();
 
-        html += `
-        <tr>
-        <td>${data.name}</td>
-        <td>${data.phone}</td>
-        <td>${data.totalScore || 0}</td>
-        <td>
-        <button onclick="deleteUser('${docSnap.id}')">
-        Delete
-        </button>
-        </td>
-        </tr>
-        `;
-    });
+            html += `
+            <tr>
+            <td>${data.name}</td>
+            <td>${data.phone}</td>
+            <td>${data.totalScore || 0}</td>
+            <td>
+            <button onclick="deleteUser('${docSnap.id}')">Delete</button>
+            </td>
+            </tr>
+            `;
+        });
+    }
 
     html += "</table>";
 
-    document.body.innerHTML += html;
+    document.getElementById("adminTable").innerHTML = html;
 }
 
+/* Delete competitor without logging out */
 window.deleteUser = async function(id){
-
     if(!confirm("Delete competitor?")) return;
 
     await deleteDoc(doc(db,"competitors",id));
 
     alert("Deleted");
-
-    /* Reload competitor list without page refresh */
-    document.body.innerHTML = "<h2>Admin Console</h2>";
-
     loadCompetitors();
 }
 
 /* Initial load */
 loadCompetitors();
-    if(html === "<table><tr><th>Name</th><th>Phone</th><th>Score</th><th>Delete</th></tr>"){
-    html += "<tr><td colspan='4'>No competitors yet</td></tr>";
-}
 
-/* Auto refresh admin list every 5 seconds */
-setInterval(()=>{
-    document.body.innerHTML = "<h2>Admin Console</h2>";
-    loadCompetitors();
-},5000);
+/* Auto-refresh table every 5 seconds */
+setInterval(loadCompetitors,5000);
 
 </script>
 
 </body>
 </html>
-
-
-
