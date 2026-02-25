@@ -1,39 +1,39 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Chadeus Maxemus</title>
-  <style>
-    body {
-      background: black;
-      color: #00ffcc;
-      text-align: center;
-      font-family: Consolas, monospace;
-      margin-top: 100px;
-    }
-    h1 {
-      font-size: 50px;
-    }
-    button {
-      padding: 12px 25px;
-      font-size: 18px;
-      background: #00ffcc;
-      color: black;
-      border: none;
-      cursor: pointer;
-    }
-    button:hover {
-      background: white;
-    }
-  </style>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Climbing Competition</title>
 </head>
+
 <body>
 
-  <h1>CHadeusMaxemus</h1>
-  <p>Welcome to my digital domain.</p>
+<h2>Climbing Competition</h2>
 
-  <button onclick="alert('Access Granted.')">
-    Enter
-  </button>
+<input id="name" placeholder="Name">
+<input id="phone" placeholder="Phone">
+
+<br><br>
+
+League:
+<select id="league">
+<option>A</option>
+<option>B</option>
+<option>C</option>
+</select>
+
+Gender:
+<select id="gender">
+<option>Male</option>
+<option>Female</option>
+</select>
+
+<h3>Boulders</h3>
+
+<div id="boulderContainer"></div>
+
+<button onclick="saveResults()">Save</button>
+
+<script type="module" src="script.js"></script>
 
 </body>
 </html>
