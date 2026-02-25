@@ -104,6 +104,9 @@ window.deleteUser = async function(id){
 
 /* Initial load */
 loadCompetitors();
+    if(html === "<table><tr><th>Name</th><th>Phone</th><th>Score</th><th>Delete</th></tr>"){
+    html += "<tr><td colspan='4'>No competitors yet</td></tr>";
+}
 
 /* Auto refresh admin list every 5 seconds */
 setInterval(()=>{
@@ -115,5 +118,6 @@ setInterval(()=>{
 
 </body>
 </html>
+
 
 
