@@ -102,10 +102,18 @@ window.deleteUser = async function(id){
     loadCompetitors();
 }
 
+/* Initial load */
 loadCompetitors();
+
+/* Auto refresh admin list every 5 seconds */
+setInterval(()=>{
+    document.body.innerHTML = "<h2>Admin Console</h2>";
+    loadCompetitors();
+},5000);
 
 </script>
 
 </body>
 </html>
+
 
