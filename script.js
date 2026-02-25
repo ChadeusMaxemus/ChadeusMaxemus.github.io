@@ -53,16 +53,20 @@ window.saveResults = async function(){
         return;
     }
 
-    const { collection, query, where, getDocs, addDoc, updateDoc, doc } =
-    await import("https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js");
-
     let totalScore = 0;
 
+    // Calculate score correctly
     for(let i=1;i<=10;i++){
 
-        let attempts = parseInt(document.getElementById("att_"+i).innerText);
-        let zone = document.getElementById("zone_"+i).checked;
-        let top = document.getElementById("top_"+i).checked;
+        const attemptsEl = document.getElementById("att_"+i);
+        const zoneEl = document.getElementById("zone_"+i);
+        const topEl = document.getElementById("top_"+i);
+
+        if(!attemptsEl || !zoneEl || !topEl) continue;
+
+        let attempts = parseInt(attemptsEl.innerText) || 0;
+        let zone = zoneEl.checked;
+        let top = topEl.checked;
 
         let points = 0;
 
@@ -76,7 +80,9 @@ window.saveResults = async function(){
         totalScore += points;
     }
 
-    // Check if competitor exists
+    const { collection, query, where, getDocs, addDoc, updateDoc, doc } =
+    await import("https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js");
+
     const q = query(
         collection(window.db,"competitors"),
         where("name","==",name),
