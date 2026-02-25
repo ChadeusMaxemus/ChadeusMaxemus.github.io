@@ -56,7 +56,27 @@ window.saveResults = async function(){
     const { collection, query, where, getDocs, addDoc, updateDoc, doc } =
     await import("https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js");
 
-    // Check if competitor already exists
+    let totalScore = 0;
+
+    for(let i=1;i<=10;i++){
+
+        let attempts = parseInt(document.getElementById("att_"+i).innerText);
+        let zone = document.getElementById("zone_"+i).checked;
+        let top = document.getElementById("top_"+i).checked;
+
+        let points = 0;
+
+        if(top){
+            points = (attempts === 1) ? 4 : 3;
+        }
+        else if(zone){
+            points = 1;
+        }
+
+        totalScore += points;
+    }
+
+    // Check if competitor exists
     const q = query(
         collection(window.db,"competitors"),
         where("name","==",name),
@@ -65,34 +85,28 @@ window.saveResults = async function(){
 
     const snapshot = await getDocs(q);
 
-    let competitorId;
-    let totalScore = 0;
-
     if(!snapshot.empty){
-        // Existing account → update
-        const existing = snapshot.docs[0];
-        competitorId = existing.id;
-        totalScore = existing.data().totalScore || 0;
 
-        await updateDoc(doc(window.db,"competitors",competitorId),{
-            league,
-            gender,
-            name,
-            phone
-        });
-    }
-    else{
-        // New competitor
-        const ref = await addDoc(collection(window.db,"competitors"),{
+        const competitor = snapshot.docs[0];
+
+        await updateDoc(doc(window.db,"competitors",competitor.id),{
             name,
             phone,
             league,
             gender,
-            totalScore:0,
-            createdAt:Date.now()
+            totalScore
         });
 
-        competitorId = ref.id;
+    } else {
+
+        await addDoc(collection(window.db,"competitors"),{
+            name,
+            phone,
+            league,
+            gender,
+            totalScore,
+            createdAt:Date.now()
+        });
     }
 
     alert("Saved");
