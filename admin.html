@@ -95,7 +95,11 @@ window.deleteUser = async function(id){
     await deleteDoc(doc(db,"competitors",id));
 
     alert("Deleted");
-    location.reload();
+
+    /* Reload competitor list without page refresh */
+    document.body.innerHTML = "<h2>Admin Console</h2>";
+
+    loadCompetitors();
 }
 
 loadCompetitors();
@@ -104,3 +108,4 @@ loadCompetitors();
 
 </body>
 </html>
+
