@@ -43,26 +43,57 @@ window.changeAttempts = function(id,delta){
 
 window.saveResults = async function(){
 
-    const name=document.getElementById("name").value;
-    const phone=document.getElementById("phone").value;
-    const league=document.getElementById("league").value;
-    const gender=document.getElementById("gender").value;
+    const name = document.getElementById("name").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const league = document.getElementById("league").value;
+    const gender = document.getElementById("gender").value;
 
-    if(!name){
-        alert("Enter name");
+    if(!name || !phone){
+        alert("Enter name and phone");
         return;
     }
 
-    let totalScore=0;
+    const { collection, query, where, getDocs, addDoc, updateDoc, doc } =
+    await import("https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js");
 
-    await addDoc(collection(db,"competitors"),{
-        name,
-        phone,
-        league,
-        gender,
-        totalScore:0,
-        createdAt:Date.now()
-    });
+    // Check if competitor already exists
+    const q = query(
+        collection(window.db,"competitors"),
+        where("name","==",name),
+        where("phone","==",phone)
+    );
 
-    alert("Saved!");
-}
+    const snapshot = await getDocs(q);
+
+    let competitorId;
+    let totalScore = 0;
+
+    if(!snapshot.empty){
+        // Existing account → update
+        const existing = snapshot.docs[0];
+        competitorId = existing.id;
+        totalScore = existing.data().totalScore || 0;
+
+        await updateDoc(doc(window.db,"competitors",competitorId),{
+            league,
+            gender,
+            name,
+            phone
+        });
+    }
+    else{
+        // New competitor
+        const ref = await addDoc(collection(window.db,"competitors"),{
+            name,
+            phone,
+            league,
+            gender,
+            totalScore:0,
+            createdAt:Date.now()
+        });
+
+        competitorId = ref.id;
+    }
+
+    alert("Saved");
+};
