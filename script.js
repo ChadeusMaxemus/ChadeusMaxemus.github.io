@@ -1,3 +1,4 @@
+"use strict";
 import { db } from "./firebase.js";
 import { collection, addDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
@@ -171,5 +172,6 @@ async function updatePlayerStatus(){
     document.getElementById("playerStatus").innerHTML = html;
 }
 
-setInterval(updatePlayerStatus,5000);
-
+window.addEventListener("load", ()=>{
+    setInterval(updatePlayerStatus,5000);
+});
