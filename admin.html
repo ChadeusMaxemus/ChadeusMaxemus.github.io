@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Console</title>
+
+<style>
+body{
+    font-family: Arial;
+    background:#111;
+    color:white;
+    text-align:center;
+}
+
+table{
+    width:90%;
+    margin:auto;
+    border-collapse: collapse;
+}
+
+td,th{
+    border:1px solid #444;
+    padding:8px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Admin Console</h2>
+
+<script type="module">
+
+import { db } from "./firebase.js";
+import {
+    collection,
+    getDocs,
+    deleteDoc,
+    doc,
+    updateDoc
+} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+/* ===== ADMIN PASSWORD ===== */
+const ADMIN_PASSWORD = "405060";
+
+/* Password Gate */
+const inputPass = prompt("Enter admin password");
+
+if(inputPass !== ADMIN_PASSWORD){
+    alert("Access denied");
+    window.location.href = "/";
+}
+
+/* Load competitors */
+async function loadCompetitors(){
+
+    const snapshot = await getDocs(collection(db,"competitors"));
+
+    let html = `
+    <table>
+    <tr>
+    <th>Name</th>
+    <th>Phone</th>
+    <th>Score</th>
+    <th>Delete</th>
+    </tr>
+    `;
+
+    snapshot.forEach(docSnap=>{
+        const data = docSnap.data();
+
+        html += `
+        <tr>
+        <td>${data.name}</td>
+        <td>${data.phone}</td>
+        <td>${data.totalScore || 0}</td>
+        <td>
+        <button onclick="deleteUser('${docSnap.id}')">
+        Delete
+        </button>
+        </td>
+        </tr>
+        `;
+    });
+
+    html += "</table>";
+
+    document.body.innerHTML += html;
+}
+
+window.deleteUser = async function(id){
+
+    if(!confirm("Delete competitor?")) return;
+
+    await deleteDoc(doc(db,"competitors",id));
+
+    alert("Deleted");
+    location.reload();
+}
+
+loadCompetitors();
+
+</script>
+
+</body>
+</html>
