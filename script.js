@@ -117,4 +117,59 @@ window.saveResults = async function(){
 
     alert("Saved");
 };
+
+async function updatePlayerStatus(){
+
+    const name = document.getElementById("name").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+
+    if(!name || !phone) return;
+
+    const { collection, query, where, getDocs, orderBy } =
+    await import("https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js");
+
+    const q = query(
+        collection(window.db,"competitors"),
+        orderBy("totalScore","desc")
+    );
+
+    const snapshot = await getDocs(q);
+
+    let competitors = [];
+    let playerRank = null;
+    let playerScore = 0;
+
+    snapshot.forEach(doc=>{
+        const data = doc.data();
+        competitors.push({
+            name:data.name,
+            phone:data.phone,
+            score:data.totalScore || 0
+        });
+    });
+
+    for(let i=0;i<competitors.length;i++){
+        if(competitors[i].name===name && competitors[i].phone===phone){
+            playerRank = i+1;
+            playerScore = competitors[i].score;
+            break;
+        }
+    }
+
+    const MAX_POINTS = 40;
+
+    let html = "Player not found";
+
+    if(playerRank !== null){
+        html = `
+        Name: ${name}<br>
+        Rank: #${playerRank}<br>
+        Score: ${playerScore} / ${MAX_POINTS}
+        `;
+    }
+
+    document.getElementById("playerStatus").innerHTML = html;
+}
+
 setInterval(updatePlayerStatus,5000);
+
