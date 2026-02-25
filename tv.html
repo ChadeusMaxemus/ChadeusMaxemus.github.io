@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Competition Leaderboard</title>
+<style>
+body { font-family: Arial; background: #111; color: #fff; text-align: center; }
+h1 { font-size: 3em; margin-bottom: 0.2em; }
+table { width: 90%; margin: auto; border-collapse: collapse; font-size: 2em; }
+th, td { padding: 15px; border-bottom: 1px solid #555; }
+tr:first-child { background: #222; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<h1>Live Leaderboard</h1>
+<table>
+<thead>
+<tr>
+<th>Rank</th>
+<th>Name</th>
+<th>League</th>
+<th>Gender</th>
+<th>Score</th>
+</tr>
+</thead>
+<tbody id="leaderboardBody">
+<tr><td colspan="5">Loading...</td></tr>
+</tbody>
+</table>
+
+<script type="module">
+import { db } from "./firebase.js";
+import { collection, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+async function updateLeaderboard() {
+    const tbody = document.getElementById("leaderboardBody");
+    const q = query(collection(db, "competitors"), orderBy("totalScore", "desc"));
+    const snapshot = await getDocs(q);
+
+    let html = "";
+    let rank = 1;
+    snapshot.forEach(doc => {
+        const data = doc.data();
+        html += `
+        <tr>
+            <td>${rank}</td>
+            <td>${data.name || "-"}</td>
+            <td>${data.league || "-"}</td>
+            <td>${data.gender || "-"}</td>
+            <td>${data.totalScore || 0}</td>
+        </tr>`;
+        rank++;
+    });
+
+    if(html === "") html = `<tr><td colspan="5">No competitors yet</td></tr>`;
+    tbody.innerHTML = html;
+}
+
+// Initial load
+updateLeaderboard();
+
+// Refresh every 5 seconds
+setInterval(updateLeaderboard, 5000);
+</script>
+
+</body>
+</html>
