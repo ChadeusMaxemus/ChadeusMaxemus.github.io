@@ -117,3 +117,4 @@ window.saveResults = async function(){
 
     alert("Saved");
 };
+setInterval(updatePlayerStatus,5000);
